@@ -1,0 +1,1 @@
+BeautifulSoup(response, "html.parser").find_all("article")

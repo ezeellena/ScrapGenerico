@@ -1,0 +1,197 @@
+import csv
+import datetime
+import json
+import os
+from unidecode import unidecode
+import requests
+from bs4 import BeautifulSoup
+
+def filtroReplace(object):
+    object.replace("/", "").replace(":", "").replace("%", "").replace("-", "").replace("[", "").replace("]", "").replace("<","").replace(
+        ">", "").replace("!", "").replace(",", "")
+    return " ".join(object.split())
+j_link_enviado = {}
+j_pag_ne={}
+mugre = ["xmlns=http://www.w3.org/1999/>", "<\n", "\n>", "<<p>", "<p>", "</p", "xmlns=http://www.w3.org/1999/>",
+         "xmlns=http://www.w3.org/1999/>", "<br />", "CDATA", "</div>>", "<div>", "</div>", "%>", "<iframe>",
+         "</iframe>", "100%", "<div", "http://w3.org/", "xmlms", "xhtml", ";>", "<", ">", "'", '"', "\/", "]", "["]
+def limpiar(texto, mugre):
+    for m in mugre:
+        texto = texto.replace(m, "")
+    return texto
+def link_enviado(l):
+    l = limpiar(l, mugre)
+    if not l in j_link_enviado.keys():
+        print(" Enviando a telegram :", l)
+        j_link_enviado[l] = 1
+        return False
+    else:
+        print(" !!!!!!!!!!!!!!! ENCONTRO DUPLICADO !!!!!!!!!!!!!!!!!! ")
+        return True
+def configuracion():
+    f = open("configParametrosGenerico.json", "r")
+    global j_config
+    j_config = {}
+    j_config = json.loads(f.read())
+    global vtelegram
+    try:
+        vtelegram = j_config["telegram"]
+    except:
+        vtelegram = True
+    global token
+    token = j_config["token"]
+    global idchat
+    idchat = j_config["id_chat"]
+    global tema
+    tema = j_config["Tema"]
+    global NombreGrupo
+    NombreGrupo = j_config["NombreGrupo"]
+    global directorio
+    directorio = j_config["directorio"]
+def enviar_noticias(arr):
+    try:
+        url_api = token + "/sendMessage"
+        # print( "- tema \n", Tema, " \n ",  NombreGrupo )
+        men_t = "✔ Noticias referidas al tema %s, enviadas al grupo de télegram %s: " % (tema, NombreGrupo) + "\n"
+        ta = False
+        # recorro el arreglo de links y lo imprimos
+        men = []
+        # print("arr \n",  arr)
+        # print( "men_t \n", men_t )
+        for a in arr:
+            # print("3- ",a)
+            # men += "- " + a + "\n\n"
+
+            # armo la linea
+            l = "- " + a + "\n\n"
+            men.append(l)
+            if a != "" and not (link_enviado(a)):
+                ta = True
+        if ta:
+            # Si tiene información, mando el título.
+            requests.post('https://api.telegram.org/' + url_api, data={'chat_id': idchat, 'text': men_t})
+            for m in men:
+                requests.post('https://api.telegram.org/' + url_api,
+                              data={'chat_id': idchat, 'text': '\n [' + NombreGrupo + ']\n' + m})
+                print(requests.status_codes)
+    except Exception as e:
+        print(" 279 - enviar ", e)
+def replaceBase(texto):
+    texto = texto.replace("http:", "").replace("//", "").replace(".", "").replace("www", "").replace(
+            "https:", "").replace("/", "").replace("\n", "").replace("-", " ")
+    return  texto
+def filtro_tema2(texto, tema):
+    c1 = tema.upper() in texto.upper()
+    for j in tema.split(","):
+        print((j, texto))
+        c2 = j.upper() in texto.upper()
+        c1 = c1 or c2
+    if c1:
+        r = True
+    else:
+        r = False
+    return r
+def log(texto):
+    l = open("log.csv", "a")
+    l.write(texto + "\n")
+    l.close()
+j = open("configGenerico.json", "r")
+confiTagPage = {}
+confiTagPage = json.loads(j.read())["j"]
+configuracion()
+
+try:
+    for web in confiTagPage[0]["link"]:
+        items = []
+        Noticia = []
+        RedesSociales = ["facebook", "twitter", "whatsapp"]
+        url = web
+        urlCortada = replaceBase(web)
+        TAGS = open("./TAGS/" + urlCortada + ".txt", "a", encoding='utf-8')
+        LINKS = open("./LINKS/" + urlCortada + ".txt", "a", encoding='utf-8')
+        try:
+            headers = {
+                'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.12; rv:55.0) Gecko/20100101 Firefox/55.0',
+            }
+            response = requests.get(url, headers=headers).text
+        except Exception as e:
+            print(" 58 - response ", e)
+        try:
+            for Noti in confiTagPage[0]["BuscarNoticia"]:
+                try:
+                    Noticias = eval(Noti)
+                    if eval(Noti) != []:
+                        Noticia.extend(Noticias)
+                        TAGS.write(Noti)
+                except Exception as e:
+                    print(e)
+        except Exception as e:
+            print(" 58 - Obtener noticias ", e)
+        TAGS.close()
+        temp9 = ""
+        for i in Noticia:
+            texto = filtroReplace(i.get_text())
+            if filtro_tema2(texto, tema):
+                ListaDeLinks = eval(confiTagPage[0]["path"])
+                palabras = texto.split()
+                palabras.append(tema)
+                if ListaDeLinks != "" and not ListaDeLinks > 10:
+                    try:
+                        for l in ListaDeLinks:
+                            linkCortado = replaceBase(l).split()
+                            totalPalabras = len([palabra for palabra in palabras if palabra in linkCortado])
+                            if 2 <= totalPalabras <= 20:
+                                totalRedes = len([redSocial for redSocial in RedesSociales if redSocial in l.lower()])
+                                if not totalRedes >= 1:
+                                    temp9 = l
+                                    LINKS.write(unidecode(temp9), '\n')
+
+                        url2 = url
+                        LINKS.close()
+                    except:
+                        print(" ********* URL no parseada correctamente: \n", url, "\n")
+                        print(i)
+                        print("**********************************************************")
+
+                        if not i.text in j_pag_ne.keys():
+                            j_pag_ne[i.text] = 1
+                            log("***** \n No scrapeó esta página: \n" + url + '\n' + str(i) + '\n ********')
+
+                    """
+                    print("- url: ", url)
+                    print("- temp9:" , temp9)
+                    print("--------------------------------")
+
+                    """
+                    if temp9[:1] == "/":
+                        temp9 = temp9[1:]
+                    if temp9[:8] == "noticias":
+                        temp9 = temp9[8:]
+                    if "http" in temp9:
+                        url2 = temp9
+                        temp9 = ""
+
+                    # print(" url final:  ", url +  temp9 + temp10 + temp11, "\n temp9: ", temp9, "\n temp10: ",temp10, "\n temp11: ",temp11, "\n temp12: ",temp12)
+
+                    j_i = {"link": url2 + temp9,
+                           "desc": filtroReplace(i.get_text()),
+                           "tmpItems": i}
+                    #if not filtro_repetida(j_i):
+                    archivoCSV = []
+                    link_noticia = j_i["link"]
+                    link_web = url
+                    FechaHoraScrapeo = str(datetime.datetime.now())
+                    archivoCSV.append(link_noticia)
+                    archivoCSV.append(link_web)
+                    archivoCSV.append(FechaHoraScrapeo)
+                    items.append(link_noticia)
+
+                    with open("out.csv", "w") as f:
+                        wr = csv.writer(f, delimiter="\n")
+                        for ele in items:
+                            wr.writerow([ele + ","])
+
+        enviar_noticias(items)
+except Exception as e:
+    print("207 - problema en el for general ", str(e.args))
+    #print("Titulo: " + titulo_noticia +"\n","Descripcion: "+ DescripcionNoticia+"\n", "Nota: " + Nota+"\n","Fecha Publicacion: "+fechaPublicacion+"\n","Fecha Publicacion Modificada: " +fechaPublicacionModificacion+"\n")
