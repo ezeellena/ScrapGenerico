@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="47faa94c-13ff-4a30-a06b-59f22a0fdaec" name="Default Changelist" comment="" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="IgnoredFileRootStore">
+    <option name="generatedRoots">
+      <set>
+        <option value="C:\Users\eellena\PycharmProjects\ScrapGenerico\.idea" />
+      </set>
+    </option>
+  </component>
+  <component name="ProjectId" id="1gvCjsAoyzs4wLrbpcJMLPbWYnx" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showExcludedFiles" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+  </component>
+  <component name="RunManager">
+    <configuration name="ScrapGenerico" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="ScrapGenerico" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/ScrapGenerico.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Python.ScrapGenerico" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="ServiceViewManager">
+    <option name="viewStates">
+      <list>
+        <serviceView>
+          <treeState>
+            <expand />
+            <select />
+          </treeState>
+        </serviceView>
+      </list>
+    </option>
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="47faa94c-13ff-4a30-a06b-59f22a0fdaec" name="Default Changelist" comment="" />
+      <created>1598985816792</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1598985816792</updated>
+    </task>
+    <task id="LOCAL-00001" summary="Subo proyecto completo">
+      <created>1598990679233</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1598990679233</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
+    <servers />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Subo proyecto completo" />
+    <option name="LAST_COMMIT_MESSAGE" value="Subo proyecto completo" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="337" y="0" key="CommitChangelistDialog2" timestamp="1598990676207">
+      <screen x="0" y="0" width="1366" height="728" />
+    </state>
+    <state x="337" y="0" key="CommitChangelistDialog2/0.0.1366.728@0.0.1366.728" timestamp="1598990676207" />
+    <state width="1364" height="440" key="DebuggerActiveHint" timestamp="1598990338757">
+      <screen x="0" y="0" width="1366" height="728" />
+    </state>
+    <state width="1364" height="440" key="DebuggerActiveHint/0.0.1366.728@0.0.1366.728" timestamp="1598990338757" />
+    <state x="463" y="106" key="FileChooserDialogImpl" timestamp="1598990823903">
+      <screen x="0" y="0" width="1366" height="728" />
+    </state>
+    <state x="463" y="106" key="FileChooserDialogImpl/0.0.1366.728@0.0.1366.728" timestamp="1598990823903" />
+    <state x="549" y="258" key="Github.ShareDialog" timestamp="1598990812916">
+      <screen x="0" y="0" width="1366" height="728" />
+    </state>
+    <state x="549" y="258" key="Github.ShareDialog/0.0.1366.728@0.0.1366.728" timestamp="1598990812916" />
+    <state width="1345" height="184" key="GridCell.Tab.0.bottom" timestamp="1598990288608">
+      <screen x="0" y="0" width="1366" height="728" />
+    </state>
+    <state width="1345" height="184" key="GridCell.Tab.0.bottom/0.0.1366.728@0.0.1366.728" timestamp="1598990288608" />
+    <state width="1345" height="184" key="GridCell.Tab.0.center" timestamp="1598990288607">
+      <screen x="0" y="0" width="1366" height="728" />
+    </state>
+    <state width="1345" height="184" key="GridCell.Tab.0.center/0.0.1366.728@0.0.1366.728" timestamp="1598990288607" />
+    <state width="1345" height="184" key="GridCell.Tab.0.left" timestamp="1598990288607">
+      <screen x="0" y="0" width="1366" height="728" />
+    </state>
+    <state width="1345" height="184" key="GridCell.Tab.0.left/0.0.1366.728@0.0.1366.728" timestamp="1598990288607" />
+    <state width="1345" height="184" key="GridCell.Tab.0.right" timestamp="1598990288608">
+      <screen x="0" y="0" width="1366" height="728" />
+    </state>
+    <state width="1345" height="184" key="GridCell.Tab.0.right/0.0.1366.728@0.0.1366.728" timestamp="1598990288608" />
+    <state width="1345" height="184" key="GridCell.Tab.1.bottom" timestamp="1598990281493">
+      <screen x="0" y="0" width="1366" height="728" />
+    </state>
+    <state width="1345" height="184" key="GridCell.Tab.1.bottom/0.0.1366.728@0.0.1366.728" timestamp="1598990281493" />
+    <state width="1345" height="184" key="GridCell.Tab.1.center" timestamp="1598990281493">
+      <screen x="0" y="0" width="1366" height="728" />
+    </state>
+    <state width="1345" height="184" key="GridCell.Tab.1.center/0.0.1366.728@0.0.1366.728" timestamp="1598990281493" />
+    <state width="1345" height="184" key="GridCell.Tab.1.left" timestamp="1598990281492">
+      <screen x="0" y="0" width="1366" height="728" />
+    </state>
+    <state width="1345" height="184" key="GridCell.Tab.1.left/0.0.1366.728@0.0.1366.728" timestamp="1598990281492" />
+    <state width="1345" height="184" key="GridCell.Tab.1.right" timestamp="1598990281493">
+      <screen x="0" y="0" width="1366" height="728" />
+    </state>
+    <state width="1345" height="184" key="GridCell.Tab.1.right/0.0.1366.728@0.0.1366.728" timestamp="1598990281493" />
+    <state x="275" y="98" key="Vcs.Push.Dialog.v2" timestamp="1598990851097">
+      <screen x="0" y="0" width="1366" height="728" />
+    </state>
+    <state x="275" y="98" key="Vcs.Push.Dialog.v2/0.0.1366.728@0.0.1366.728" timestamp="1598990851097" />
+  </component>
+</project>
