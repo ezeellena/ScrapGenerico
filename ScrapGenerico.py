@@ -6,7 +6,6 @@ import requests
 import csv
 import re
 import os
-from unidecode import unidecode
 from bs4 import BeautifulSoup
 
 j_link_enviado = {}
@@ -65,8 +64,10 @@ def replaceURL(texto):
             "https:", "").replace("/", "").replace("\n", "").replace("-", "")
     return  texto
 
+
 class RSSParser(object):
     def parse(self,confiTagPage, urlytag, tema):
+        ListaDeLinks = []
         items = []
         Noticia = []
         RedesSociales = ["facebook", "twitter", "whatsapp"]
@@ -83,6 +84,7 @@ class RSSParser(object):
             print(" 58 - response ", e)
         try:
             for Noti in confiTagPage[0]["BuscarNoticia"]:
+
                 try:
                     Noticias = eval(Noti)
                     if eval(Noti) != []:
@@ -98,12 +100,12 @@ class RSSParser(object):
             for i in Noticia:
                 texto = filtroReplace(i.get_text())
                 if filtro_tema2(texto, tema):
-                    ListaDeLinks = eval(confiTagPage[0]["path"])
-                    ListaDeLinks = set(ListaDeLinks)
+                    ListaDeLinks = set(eval(confiTagPage[0]["path"]))
                     url2 = url
                     if len(ListaDeLinks) == 1:
                         temp9 = list(ListaDeLinks)
                         temp9 = str(temp9[0])
+                        LINKS.write((temp9) + '\n')
                     else:
                         palabras = texto.split()
                         palabras.append(tema)
@@ -116,7 +118,7 @@ class RSSParser(object):
                                         totalRedes = len([redSocial for redSocial in RedesSociales if redSocial in l.lower()])
                                         if not totalRedes >= 1:
                                             temp9 = l
-                                            LINKS.write(unidecode(temp9) + '\n')
+                                            LINKS.write((temp9) + '\n')
                             except Exception as e:
                                 print(" 58 - Obtener noticias ", e)
                                 print(" ********* URL no parseada correctamente: \n", url, "\n")
