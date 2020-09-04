@@ -65,7 +65,6 @@ def replaceURL(texto):
             "https:", "").replace("/", "").replace("\n", "").replace("-", "")
     return  texto
 
-
 class RSSParser(object):
     def parse(self,confiTagPage, urlytag, tema):
         items = []
@@ -88,7 +87,7 @@ class RSSParser(object):
                     Noticias = eval(Noti)
                     if eval(Noti) != []:
                         Noticia.extend(Noticias)
-                        TAGS.write(Noti)
+                        TAGS.write(Noti + '\n')
                 except Exception as e:
                     print(e)
         except Exception as e:
@@ -100,50 +99,53 @@ class RSSParser(object):
                 texto = filtroReplace(i.get_text())
                 if filtro_tema2(texto, tema):
                     ListaDeLinks = eval(confiTagPage[0]["path"])
-                    palabras = texto.split()
-                    palabras.append(tema)
-                    if ListaDeLinks != "":
-                        try:
-                            for l in ListaDeLinks:
-                                linkCortado = replaceBase(l).split()
-                                totalPalabras = len([palabra for palabra in palabras if palabra in linkCortado])
-                                if 2 <= totalPalabras <= 20:
-                                    totalRedes = len([redSocial for redSocial in RedesSociales if redSocial in l.lower()])
-                                    if not totalRedes >= 1:
-                                        temp9 = l
-                                        LINKS.write(unidecode(temp9) + '\n')
+                    ListaDeLinks = set(ListaDeLinks)
+                    url2 = url
+                    if len(ListaDeLinks) == 1:
+                        temp9 = list(ListaDeLinks)
+                        temp9 = str(temp9[0])
+                    else:
+                        palabras = texto.split()
+                        palabras.append(tema)
+                        if ListaDeLinks != "":
+                            try:
+                                for l in ListaDeLinks:
+                                    linkCortado = replaceBase(l).split()
+                                    totalPalabras = len([palabra for palabra in palabras if palabra in linkCortado])
+                                    if 2 <= totalPalabras <= 20:
+                                        totalRedes = len([redSocial for redSocial in RedesSociales if redSocial in l.lower()])
+                                        if not totalRedes >= 1:
+                                            temp9 = l
+                                            LINKS.write(unidecode(temp9) + '\n')
+                            except Exception as e:
+                                print(" 58 - Obtener noticias ", e)
+                                print(" ********* URL no parseada correctamente: \n", url, "\n")
+                                print(i)
+                                print("**********************************************************")
 
-                            url2 = url
+                                if not i.text in j_pag_ne.keys():
+                                    j_pag_ne[i.text] = 1
+                                    log("***** \n No scrapeó esta página: \n" + url + '\n' + str(i) + '\n ********')
 
-                        except Exception as e:
-                            print(" 58 - Obtener noticias ", e)
-                            print(" ********* URL no parseada correctamente: \n", url, "\n")
-                            print(i)
-                            print("**********************************************************")
+                            """
+                            print("- url: ", url)
+                            print("- temp9:" , temp9)
+                            print("--------------------------------")
+        
+                            """
+                    if temp9[:1] == "/":
+                        temp9 = temp9[1:]
+                    if temp9[:8] == "noticias":
+                        temp9 = temp9[8:]
+                    if "http" in temp9:
+                        url2 = temp9
+                        temp9 = ""
 
-                            if not i.text in j_pag_ne.keys():
-                                j_pag_ne[i.text] = 1
-                                log("***** \n No scrapeó esta página: \n" + url + '\n' + str(i) + '\n ********')
+                            # print(" url final:  ", url +  temp9 + temp10 + temp11, "\n temp9: ", temp9, "\n temp10: ",temp10, "\n temp11: ",temp11, "\n temp12: ",temp12)
 
-                        """
-                        print("- url: ", url)
-                        print("- temp9:" , temp9)
-                        print("--------------------------------")
-    
-                        """
-                        if temp9[:1] == "/":
-                            temp9 = temp9[1:]
-                        if temp9[:8] == "noticias":
-                            temp9 = temp9[8:]
-                        if "http" in temp9:
-                            url2 = temp9
-                            temp9 = ""
-
-                        # print(" url final:  ", url +  temp9 + temp10 + temp11, "\n temp9: ", temp9, "\n temp10: ",temp10, "\n temp11: ",temp11, "\n temp12: ",temp12)
-
-                        j_i = {"link": url2 + temp9,
-                               "desc": filtroReplace(i.get_text()),
-                               "tmpItems": i}
+                    j_i = {"link": url2 + temp9,
+                           "desc": filtroReplace(i.get_text()),
+                           "tmpItems": i}
                     if not filtro_repetida(j_i):
                         archivoCSV = []
                         link_noticia = j_i["link"]
