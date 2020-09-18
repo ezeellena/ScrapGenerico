@@ -9,7 +9,28 @@ import os
 from unidecode import unidecode
 from bs4 import BeautifulSoup
 from openpyxl import Workbook
+from nube import texto2els
 
+
+def actualizar_tema(grupo_telegram, tema_anterior):
+
+    try:
+        grupo_telegram = grupo_telegram.lower()
+
+
+        # me conecto a la API de Sonda para ver que tema tiene asignado cada grupo
+        url = url_api_sonda + "/sb_get_tema/?grupo="+grupo_telegram
+        r = requests.get(url).text
+
+        if tema_anterior != ",".join(eval(r)):
+            enviar_noticias(["---------------------------------------------------------------\n"
+                             "--"
+                             "\n *El término de búsqueda ahora es:* "+ r +""
+                             "\n------------------------------------------------------------"])
+
+        return r
+    except Exception as e:
+        return "-1"
 
 j_link_enviado = {}
 j_pag_ne = {}
@@ -78,6 +99,8 @@ def configuracionExcels(url):
     hoja['A3'] = "TEXTO OBTENIDO"
     hoja['B3'] = "LINKS DE LAS NOTICIAS"
     hoja['C3'] = "TAG CON EL QUE ENCONTRO LAS NOTICIAS"
+    hoja['D3'] = "TODOS LOS LINKS DE LA NOTICIA"
+    hoja['E3'] = "HTML"
     hoja['A2'] = url
 
     global error1
@@ -116,7 +139,6 @@ class RSSParser(object):
             urlCortada = "Google"
         else:
             urlCortada = replaceURL(urlytag)
-        NOTICIAS = open("./NOTICIAS/" + urlCortada + ".csv", "a", encoding='utf-8')
         LINKS = open("./LINKS/" + urlCortada + ".csv", "a", encoding='utf-8')
 
         configuracionExcels(url)
@@ -140,7 +162,10 @@ class RSSParser(object):
                     if Noticias != []:
                         Noticia.extend(Noticias)
                         for i, Noticiae in enumerate(Noticias):
-                            hoja.cell(row=i + 4, column=1).value = filtroReplace(Noticiae.text)
+                            LIIINKS = [a['href'] for a in Noticiae.find_all('a', href=True)]
+                            LIIINKS = ', '.join(LIIINKS)
+                            hoja.cell(row=i + 4, column=1).value = filtroReplace(unidecode(Noticiae.text))
+                            hoja.cell(row=i + 4, column=4).value = LIIINKS
                             hoja.cell(row=i + 4, column=3).value = str(Noti)
                             LINKS.write('----------HTML-----------:'+ '\n' + str(filtroReplace(Noticiae.text)) + '\n')
                 except Exception as e:
@@ -150,7 +175,7 @@ class RSSParser(object):
         except Exception as e:
             print("Error 3 - Obtener Articulos de noticias ", e)
         temp9 = ""
-        row = 1
+        row = 3
 
         try:
             for i in Noticia:
@@ -159,56 +184,54 @@ class RSSParser(object):
                 if filtro_tema2(texto, tema) and texto != '':
 
                     ListaDeLinks = eval(confiTagPage["j"]["path"])
-                    SetDeLinks = set(ListaDeLinks)
-                    url2 = url
-                    try:
-                        resultado = contarElementosLista(ListaDeLinks)
-                        maximo = max(resultado, key=resultado.get)
-                        print("El valor mas repetido es el ", maximo, " con ", resultado[maximo], " veces")
-                    except Exception as e:
-                        print(" 4 - Obtener Resultado maximo de links ", e)
-                        hojaExcelDeError2.cell(row=fila + 4, column=3).value = str(e)
-                        hojaExcelDeError2.cell(row=fila + 4, column=4).value = str(resultado)
-                        hojaExcelDeError2.cell(row=fila + 4, column=5).value = str(maximo)
-                    if len(SetDeLinks) == 1 and list(SetDeLinks)[0] != urlytag:
-                        temp9 = list(SetDeLinks)
-                        temp9 = str(temp9[0])
-                        hoja.cell(row=row, column=2).value = temp9
-                        LINKS.write('----------LINK-----------'+'\n'+ str(unidecode(temp9))+'\n'+  '----------HTML-----------:' +'\n'+ unidecode(str(texto)) +  '\n')
-                    else:
-                        palabras = texto.split()
-                        palabras.append(tema)
-                        if ListaDeLinks != "":
-                            try:
-                                for l in ListaDeLinks:
-                                    linkCortado = replaceBase(l).split()
-                                    totalPalabras = len([palabra for palabra in palabras if palabra in linkCortado])
-                                    if 2 <= totalPalabras <= 20:
-                                        totalRedes = len([redSocial for redSocial in RedesSociales if redSocial in l.lower()])
-                                        if not totalRedes >= 1:
-                                            temp9 = l
-                                            LINKS.write(unidecode(temp9) + '\n')
-                                    else:
-                                        if resultado[maximo] >= 2:
-                                            temp9 = maximo
-                                            hoja.cell(row=row, column=2).value = temp9
-                                            LINKS.write('----------LINK-----------' + '\n' + str(unidecode(
-                                                temp9)) + '\n' + '----------HTML-----------:' + '\n' + unidecode(str(
-                                                texto)) + '\n')
+                    if ListaDeLinks != "":
+                        SetDeLinks = set(ListaDeLinks)
+                        url2 = url
+                        try:
+                            resultado = contarElementosLista(ListaDeLinks)
+                            maximo = max(resultado, key=resultado.get)
+                            print("El valor mas repetido es el ", maximo, " con ", resultado[maximo], " veces")
+                        except Exception as e:
+                            print(" 4 - Obtener Resultado maximo de links ", e)
+                            hojaExcelDeError2.cell(row=fila + 4, column=3).value = str(e)
+                            hojaExcelDeError2.cell(row=fila + 4, column=4).value = str(resultado)
+                            hojaExcelDeError2.cell(row=fila + 4, column=5).value = str(maximo)
+                        if len(SetDeLinks) == 1 and list(SetDeLinks)[0] != urlytag:
+                            temp9 = list(SetDeLinks)
+                            temp9 = str(temp9[0])
+                            hoja.cell(row=row, column=2).value = temp9
+                            LINKS.write('----------LINK-----------'+'\n'+ str(unidecode(temp9))+'\n'+  '----------HTML-----------:' +'\n'+ unidecode(str(texto)) +  '\n')
+                        else:
+                            if resultado[maximo] >= 2:
+                                temp9 = maximo
+                                hoja.cell(row=row, column=2).value = temp9
+                                LINKS.write('----------LINK-----------' + '\n' + str(unidecode(
+                                    temp9)) + '\n' + '----------HTML-----------:' + '\n' + unidecode(str(
+                                    texto)) + '\n')
+                            else:
+                                palabras = texto.split()
+                                palabras.append(tema)
+                                try:
+                                    for l in ListaDeLinks:
+                                        linkCortado = replaceBase(l).split()
+                                        totalPalabras = len([palabra for palabra in palabras if palabra in linkCortado])
+                                        if 2 <= totalPalabras <= 20:
+                                            totalRedes = len([redSocial for redSocial in RedesSociales if redSocial in l.lower()])
+                                            if not totalRedes >= 1:
+                                                temp9 = l
+                                                LINKS.write(unidecode(temp9) + '\n')
 
+                                except Exception as e:
+                                    hojaExcelDeError2.cell(row=fila + 4, column=7).value = str(e.args)
+                                    hojaExcelDeError2.cell(row=fila + 4, column=8).value = str(i)
+                                    print(" ERROR 5 - NO ESCRAPEO NADA ", e)
+                                    print(" ********* URL no parseada correctamente: \n", url, "\n")
+                                    print(i)
+                                    print("**********************************************************")
 
-                            except Exception as e:
-
-                                hojaExcelDeError2.cell(row=fila + 4, column=7).value = str(e.args)
-                                hojaExcelDeError2.cell(row=fila + 4, column=8).value = str(i)
-                                print(" ERROR 5 - NO ESCRAPEO NADA ", e)
-                                print(" ********* URL no parseada correctamente: \n", url, "\n")
-                                print(i)
-                                print("**********************************************************")
-
-                                if not i.text in j_pag_ne.keys():
-                                    j_pag_ne[i.text] = 1
-                                    log("***** \n No scrapeó esta página: \n" + url + '\n' + str(i) + '\n ********')
+                                    if not i.text in j_pag_ne.keys():
+                                        j_pag_ne[i.text] = 1
+                                        log("***** \n No scrapeó esta página: \n" + url + '\n' + str(i) + '\n ********')
 
 
                             """
@@ -236,6 +259,8 @@ class RSSParser(object):
                     if not filtro_repetida(j_i):
                         archivoCSV = []
                         LinkNotcia = j_i["link"]
+                        DescripcionNoticia = ""
+                        fechaPublicacion = ""
                         #response2 = requests.get(LinkNotcia, headers=headers).text
                         link_web = url
                         FechaHoraScrapeo = str(datetime.datetime.now())
@@ -245,9 +270,9 @@ class RSSParser(object):
                             wr = csv.writer(f, delimiter="\n")
                             for ele in items:
                                 wr.writerow([ele + ","])
-
+                        texto2els(texto, FechaHoraScrapeo, LinkNotcia)
             LINKS.close()
-            error2.save('./Excel/Segundo_Error_Obtener_Links/' + urlCortada + '-Errores.xlsx')
+            #error2.save('./Excel/Segundo_Error_Obtener_Links/' + urlCortada + '-Errores.xlsx')
             PagNoticiaLink.save('./Excel/' + urlCortada + '-Noticias.xlsx')
             #hojaExcelDeErrores.save('./Excel/errores' + urlCortada + '-Errores.xlsx')
             return items
@@ -349,6 +374,11 @@ def configuracion():
     j_config = {}
     j_config = json.loads(f.read())
     global vtelegram
+    global grupo_telegram_fijo
+    grupo_telegram_fijo = j_config["grupo_telegram_fijo"]
+    global url_api_sonda
+    url_api_sonda = j_config["url_api_sonda"]
+
     try:
         vtelegram = j_config["telegram"]
     except:
@@ -395,7 +425,9 @@ if __name__ == "__main__":
     if urlNueva != "":
         confiTagPage["j"]["link"].append(urlNueva)
         write_json(confiTagPage)
-
+    result = actualizar_tema(grupo_telegram_fijo, Tema)
+    if result != "-1":
+        Tema = ",".join(eval(result))
     while True:
         try:
             for url in confiTagPage["j"]["link"]:
@@ -409,6 +441,20 @@ if __name__ == "__main__":
                     LinksDePaginasWeb[url] = 1
                     save_persist('LinksDePaginasWeb')
                 if url != "":
+
+                    ################################################################
+
+                    # Actualizo el tema de búsqueda
+                    result = actualizar_tema(grupo_telegram_fijo, Tema)
+                    if result != "-1":
+                        Tema = ",".join(eval(result))
+
+                    # print( "********************************" )
+                    print("TEMA:\n\n", Tema)
+                    # print( "********************************" )
+                    if url == "http://www.paralelo28.com.ar/":
+                        eze = 1+1
+                    ##########################################################33
                     print(" Procesando la url:  ", url)
                     r = RSSParser().parse(confiTagPage, url, Tema)
                     if r != []:
