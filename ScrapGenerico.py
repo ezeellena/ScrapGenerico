@@ -96,37 +96,25 @@ def configuracionExcels(url):
     global hoja
     hoja = PagNoticiaLink.active
     hoja['A1'] = "URL"
+    hoja['A2'] = url
     hoja['A3'] = "TEXTO OBTENIDO"
     hoja['B3'] = "LINKS DE LAS NOTICIAS"
     hoja['C3'] = "TAG CON EL QUE ENCONTRO LAS NOTICIAS"
     hoja['D3'] = "TODOS LOS LINKS DE LA NOTICIA"
     hoja['E3'] = "HTML"
-    hoja['A2'] = url
-
-    global error1
-    error1 = Workbook()
-    global hojaExcelError1
-    hojaExcelError1 = error1.active
-    hojaExcelError1.title = "Error Pagina"
-    hojaExcelError1['A1'] = "URL"
-    hojaExcelError1['A2'] = url
-    hojaExcelError1['A3'] = "ERRORES PARA OBTENER EL RESPONSE"
-
-    global error2
-    error2 = Workbook()
-    global hojaExcelDeError2
-    hojaExcelDeError2 = error2.active
-    hojaExcelDeError2['A1'] = "URL"
-    hojaExcelDeError2['A2'] = url
-    hojaExcelDeError2['A3'] = "ERRORES PARA OBTENER LAS NOTICIAS"
-    hojaExcelDeError2['B3'] = "TEXTO DE LA NOTICIA"
-    hojaExcelDeError2['C3'] = "ERROR PRIMERA FORMA PARA BUSCAR LINK"
-    hojaExcelDeError2['D3'] = "RESULTADO"
-    hojaExcelDeError2['E3'] = "EL MAXIMO DE LINKS OBTENIDO"
-    hojaExcelDeError2['F3'] = "ERROR SEGUNDA FORMA PARA BUSCAR LINK"
-    hojaExcelDeError2['G3'] = "HTML COMPLETO"
-
-    return PagNoticiaLink, hoja, hojaExcelError1, error1, hojaExcelDeError2, error2
+    hoja['F3'] = "TITULO NOTICIA"
+    hoja['G3'] = "DESCRIPCION NOTICIA"
+    hoja['H3'] = "FECHA PUBLICACION NOTICIA"
+    hoja['I3'] = "FECHA MODIFICACION NOTICIA"
+    hoja['J3'] = "ERRORES"
+    hoja['K3'] = "ERRORES"
+    hoja['L3'] = "ERRORES"
+    hoja['M3'] = "ERRORES"
+    hoja['N3'] = "ERRORES"
+    hoja['O3'] = "ERRORES"
+    hoja['P3'] = "ERRORES"
+    hoja['Q3'] = "ERRORES"
+    return PagNoticiaLink, hoja
 
 class RSSParser(object):
     def parse(self,confiTagPage, urlytag, tema):
@@ -135,10 +123,12 @@ class RSSParser(object):
         Noticia = []
         RedesSociales = ["facebook", "twitter", "whatsapp"]
         self.url = urlytag
+        global urlCortada
         if "news.google" in urlytag:
-            urlCortada = "Google"
+             urlCortada = "Google"
         else:
-            urlCortada = replaceURL(urlytag)
+
+            urlCortada= replaceURL(urlytag)
         LINKS = open("./LINKS/" + urlCortada + ".csv", "a", encoding='utf-8')
 
         configuracionExcels(url)
@@ -148,10 +138,7 @@ class RSSParser(object):
             }
             response = requests.get(url, headers=headers).text
         except Exception as e:
-            hojaExcelError1.cell(row=2, column=1).value = url
-            hojaExcelError1.cell(row=4, column=1).value = str(e.args)
             print("Error 1 - Obtener Response ", e)
-        error1.save('./Excel/Primer_Error_Obtener_Response/' + urlCortada + '-ERROR1.xlsx')
         fila = 0
         try:
             LINKS.write('----------LINK-----------' + '\n' + str(url))
@@ -169,8 +156,8 @@ class RSSParser(object):
                             hoja.cell(row=i + 4, column=3).value = str(Noti)
                             LINKS.write('----------HTML-----------:'+ '\n' + str(filtroReplace(Noticiae.text)) + '\n')
                 except Exception as e:
-                    hojaExcelDeError2.cell(row=fila + 4, column=1).value = str(e.args)
-                    hojaExcelDeError2.cell(row=fila + 4, column=2).value = filtroReplace(Noticiae.text)
+                    hoja.cell(row=fila + 4, column=10).value = str(e.args)
+                    hoja.cell(row=fila + 4, column=11).value = filtroReplace(Noticiae.text)
                     print("Error 2 - Obtener Articulos de noticias ", e)
         except Exception as e:
             print("Error 3 - Obtener Articulos de noticias ", e)
@@ -180,6 +167,8 @@ class RSSParser(object):
         try:
             for i in Noticia:
                 row +=1
+
+                hoja.cell(row=row, column=5).value = str(i)
                 texto = filtroReplace(i.get_text())
                 if filtro_tema2(texto, tema) and texto != '':
 
@@ -193,9 +182,9 @@ class RSSParser(object):
                             print("El valor mas repetido es el ", maximo, " con ", resultado[maximo], " veces")
                         except Exception as e:
                             print(" 4 - Obtener Resultado maximo de links ", e)
-                            hojaExcelDeError2.cell(row=fila + 4, column=3).value = str(e)
-                            hojaExcelDeError2.cell(row=fila + 4, column=4).value = str(resultado)
-                            hojaExcelDeError2.cell(row=fila + 4, column=5).value = str(maximo)
+                            hoja.cell(row=fila + 4, column=12).value = str(e)
+                            hoja.cell(row=fila + 4, column=13).value = str(resultado)
+                            hoja.cell(row=fila + 4, column=14).value = str(maximo)
                         if len(SetDeLinks) == 1 and list(SetDeLinks)[0] != urlytag:
                             temp9 = list(SetDeLinks)
                             temp9 = str(temp9[0])
@@ -222,8 +211,8 @@ class RSSParser(object):
                                                 LINKS.write(unidecode(temp9) + '\n')
 
                                 except Exception as e:
-                                    hojaExcelDeError2.cell(row=fila + 4, column=7).value = str(e.args)
-                                    hojaExcelDeError2.cell(row=fila + 4, column=8).value = str(i)
+                                    hoja.cell(row=fila + 4, column=15).value = str(e.args)
+                                    hoja.cell(row=fila + 4, column=16).value = str(i)
                                     print(" ERROR 5 - NO ESCRAPEO NADA ", e)
                                     print(" ********* URL no parseada correctamente: \n", url, "\n")
                                     print(i)
@@ -239,7 +228,6 @@ class RSSParser(object):
                             print("- temp9:" , temp9)
                             print("--------------------------------")
                         """
-                    error2.save('./Excel/Segundo_Error_Obtener_Links/' + urlCortada + '-Errores.xlsx')
                     if temp9[:1] == "/":
                         temp9 = temp9[1:]
                     if temp9[:2] == "./":
@@ -261,7 +249,33 @@ class RSSParser(object):
                         LinkNotcia = j_i["link"]
                         DescripcionNoticia = ""
                         fechaPublicacion = ""
-                        #response2 = requests.get(LinkNotcia, headers=headers).text
+                        response2 = requests.get(LinkNotcia, headers=headers).text
+                        Titulo = []
+                        for Titu in confiTagPage["j"]["tituloNoticia"]:
+                            try:
+                                Titulos = eval(Titu)
+                                if Titulos != []:
+                                    Titulo.append(Titulos)
+                            except Exception as e:
+                                print(" Obtener Titulo", e,Titu)
+                                hoja.cell(row=row, column=17).value = str(e)
+                        resultadoTitulo = contarElementosLista(Titulo)
+                        maximoTitulo = max(resultadoTitulo, key=resultadoTitulo.get)
+                        hoja.cell(row=row, column=6).value = maximoTitulo
+                        print("El valor mas repetido es el ", maximoTitulo, " con ", resultadoTitulo[maximoTitulo], " veces")
+                        Descripcion = []
+                        for Descr in confiTagPage["j"]["descripcionNoticia"]:
+                            try:
+                                Descripciones = eval(Descr)
+                                if Descripciones != []:
+                                    Descripcion.append(Descripciones)
+                            except Exception as e:
+                                print(" Obtener Titulo", e,Descr)
+                                hoja.cell(row=row, column=18).value = str(e)
+                        resultadoDescripcion = contarElementosLista(Descripcion)
+                        maximoDescripcion = max(resultadoDescripcion, key=resultadoDescripcion.get)
+                        hoja.cell(row=row, column=7).value = maximoDescripcion
+                        print("El valor mas repetido es el ", maximoDescripcion, " con ", resultadoDescripcion[maximoDescripcion], " veces")
                         link_web = url
                         FechaHoraScrapeo = str(datetime.datetime.now())
                         archivoCSV.append(link_web + ',\n' + ',\n' + LinkNotcia + ',\n' + FechaHoraScrapeo)
@@ -272,12 +286,12 @@ class RSSParser(object):
                                 wr.writerow([ele + ","])
                         texto2els(texto, FechaHoraScrapeo, LinkNotcia)
             LINKS.close()
-            #error2.save('./Excel/Segundo_Error_Obtener_Links/' + urlCortada + '-Errores.xlsx')
             PagNoticiaLink.save('./Excel/' + urlCortada + '-Noticias.xlsx')
             #hojaExcelDeErrores.save('./Excel/errores' + urlCortada + '-Errores.xlsx')
             return items
         except Exception as e:
             print(" 100 - Obtener links ", e)
+            hoja.cell(row=row, column=10).value = str(e)
 
 
 def filtroReplace(object):
@@ -457,6 +471,7 @@ if __name__ == "__main__":
                     ##########################################################33
                     print(" Procesando la url:  ", url)
                     r = RSSParser().parse(confiTagPage, url, Tema)
+                    PagNoticiaLink.save('./Excel/' + urlCortada + '-Noticias.xlsx')
                     if r != []:
                         enviar_noticias(r)
         except Exception as e:
